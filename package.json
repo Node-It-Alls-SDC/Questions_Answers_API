@@ -1,6 +1,9 @@
 {
   "name": "questions_answers_api",
   "description": "API for Questions and Answers section of an E-commerce site using mongoDB and expressJS",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
   "dependencies": {
     "csv-parser": "^3.2.0",
     "dotenv": "^16.4.7",
