@@ -9,93 +9,140 @@ const photos = './data/answers_photos.csv';
 
 
 
-const questionStream = (QuestionModel) => {
-  var questionsData = [];
-  fs.createReadStream(questions)
-  .pipe(csv({
-    mapHeaders: ({ header, index }) => {
-      switch (header) {
-        case 'id':
-          return '_id';
-        case 'date_written':
-          return 'createdAt';
-        default:
-          return header;
+const questionStream = (Questions) => {
+  return new Promise ((resolve, reject) => {
+    var questionsData = [];
+    fs.createReadStream(questions)
+    .pipe(csv({
+      mapHeaders: ({ header, index }) => {
+        switch (header) {
+          case 'date_written':
+            return 'createdAt';
+          case 'product_id':
+            return 'ProductId';
+          default:
+            return header;
+        }
+      },
+      mapValues: ({ header, index, value}) => {
+        switch (header) {
+          case 'id':
+          case 'ProductId':
+          case 'helpful':
+            return Number(value);
+          case 'reported':
+            return Boolean(value);
+          case 'createdAt':
+            return new Date(Number(value));
+          default:
+            return value;
+        }
       }
-    },
-    mapValues: ({ header, index, value}) => {
-      switch (header) {
-        case '_id':
-        case 'product_id':
-        case 'helpful':
-          return Number(value);
-        case 'reported':
-          return Boolean(value);
-        case 'createdAt':
-          return new Date(Number(value));
-        default:
-          return value;
+    }))
+    .on('data', question => {
+      questionsData.push(question);
+      if (questionsData.length === 10000) {
+        var inserted = questionsData.slice();
+        questionsData = [];
+        Questions.bulkCreate(inserted)
+          .catch((err) => reject(err))
       }
-    }
-  }))
-  .on('data', question => {
-    question['answers'] = {};
-    questionsData.push(question);
-    if (questionsData.length === 10000) {
-      console.log('here')
-      var inserted = questionsData.slice();
-      questionsData = [];
-      QuestionModel.insertMany(inserted)
-        .then(() => console.log('successful batch'))
-        .catch((err) => console.error(err))
-    }
-  })
-  .on('error', err => {
-    console.error(err.message);
-  })
-  .on('end', () => {
-    QuestionModel.insertMany(questionsData)
-      .then(() => console.log('successful batch'))
-      .catch((err) => console.error(err))
-    console.log('Questions read successfully');
+    })
+    .on('error', err => {
+      reject(err.message);
+    })
+    .on('end', () => {
+      Questions.bulkCreate(questionsData)
+        .then(() => resolve('Questions submitted successfully'))
+        .catch((err) => reject(err))
+    })
   })
 }
 
 module.exports.questionStream = questionStream;
-  // fs.createReadStream(answers)
-  // .pipe(csv())
-  // .on('data', answer => {
-  //   answer['id'] = Number(answer['id']);
-  //   answer['question_id'] = Number(answer['question_id']);
-  //   answer['date_written'] = new Date(Number(answer['date_written']));
-  //   answer['reported'] = Number(answer['reported']);
-  //   answer['helpful'] = Number(answer['helpful']);
-  //   answer['photos'] = [];
-  //   questionsData[answer['question_id']]['answers'][answer['id']] = answer;
-  // })
-  // .on('error', err => {
-  //   console.error(err.message);
-  // })
-  // .on('end', () => {
-  //   questionsData = [...Object.values(questionsData)];
-  //   var i = 0;
-  //   fs.createReadStream(photos)
-  //     .pipe(csv())
-  //     .on('data', photo => {
-  //       for (i; i < questionsData.length; i++) {
-  //         if (questionsData[i]['answers'][photo['answer_id']]) {
-  //           photo['id'] = Number(answer['id']);
-  //           photo['answer_id'] = Number(photo['answer_id']);
-  //           console.log(photo);
-  //           questionsData[i]['answers'][photo['answer_id']]['photos'].push(photo);
-  //           break;
-  //         }
-  //       }
-  //     })
-  //     .on('error', err => {
-  //       console.error(err.message);
-  //     })
-  //     .on('end', () => {
-  //       console.log('Photos read successfully')
-  //     })
-  // })
+
+const answerStream = (Answers) => {
+  return new Promise ((resolve, reject) => {
+    var answersData = [];
+    fs.createReadStream(answers)
+    .pipe(csv({
+      mapHeaders: ({ header, index }) => {
+        switch (header) {
+          case 'question_id':
+            return 'QuestionId';
+          case 'date_written':
+            return 'createdAt';
+          default:
+            return header;
+        }
+      },
+      mapValues: ({ header, index, value}) => {
+        switch (header) {
+          case 'id':
+          case 'QuestionId':
+          case 'helpful':
+            return Number(value);
+          case 'reported':
+            return Boolean(value);
+          case 'createdAt':
+            return new Date(Number(value));
+          default:
+            return value;
+        }
+      }
+    }))
+    .on('data', answer => {
+      answersData.push(answer);
+      if (answersData.length === 10000) {
+        var inserted = answersData.slice();
+        answersData = [];
+        Answers.bulkCreate(inserted)
+          .catch((err) => reject(err))
+      }
+    })
+    .on('error', err => {
+      reject(err.message);
+    })
+    .on('end', () => {
+      Answers.bulkCreate(answersData)
+        .then(() => resolve('Answers submitted successfully'))
+        .catch((err) => reject(err))
+    })
+  })
+}
+module.exports.answerStream = answerStream;
+
+const photoStream = (Photos) => {
+  return new Promise ((resolve, reject) => {
+    var photosData = [];
+    fs.createReadStream(photos)
+    .pipe(csv({
+      mapHeaders: ({ header, index }) => {
+        switch (header) {
+          case 'answer_id':
+            return 'AnswerId';
+          default:
+            return header;
+        }
+      }
+    }))
+    .on('data', photo => {
+      photosData.push(photo);
+      if (photosData.length === 10000) {
+        var inserted = photosData.slice();
+        photosData = [];
+        Photos.bulkCreate(inserted)
+          .catch((err) => reject(err))
+      }
+    })
+    .on('error', err => {
+      reject(err.message);
+    })
+    .on('end', () => {
+      Photos.bulkCreate(photosData)
+        .then(() => resolve('Finished ETL Process'))
+        .catch((err) => reject(err))
+    })
+  })
+}
+module.exports.photoStream = photoStream;

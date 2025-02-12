@@ -1,4 +1,18 @@
-const QuestionModel = require('./db.js');
-const {questionStream} = require('./extract.js');
+const Models = require('./db.js');
+const {questionStream, answerStream, photoStream} = require('./extract.js');
 
-questionStream(QuestionModel);
+questionStream(Models.Questions)
+  .then((firstres) => {
+    console.log(firstres);
+    answerStream(Models.Answers)
+      .then((secondres) => {
+        console.log(secondres);
+        photoStream(Models.Photos)
+          .then((thirdres) => {
+            console.log(thirdres);
+          })
+          .catch(err => console.error(err))
+      })
+      .catch(err => console.error(err))
+  })
+  .catch(err => console.error(err))
