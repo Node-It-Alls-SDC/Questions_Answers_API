@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const controller = require('./controller.js');
+const {transformQuestion} = require('./transform.js');
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -18,7 +19,12 @@ app.get('/qa/questions', (req, res) => {
     return res.status(400).send('Product ID is missing');
   }
   controller.getQuestions(req.query.product_id, Number(req.query?.page), Number(req.query?.count))
-    .then(result => res.send(result))
+    .then(result => {
+      res.send({
+        product_id: req.query.product_id,
+        results: transformQuestion(result)
+      })
+    })
     .catch(err => res.status(404).send(err))
 })
 

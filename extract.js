@@ -29,9 +29,8 @@ const questionStream = (Questions) => {
           case 'id':
           case 'ProductId':
           case 'helpful':
-            return Number(value);
           case 'reported':
-            return Boolean(value);
+            return Number(value);
           case 'createdAt':
             return new Date(Number(value));
           default:
@@ -81,9 +80,8 @@ const answerStream = (Answers) => {
           case 'id':
           case 'QuestionId':
           case 'helpful':
-            return Number(value);
           case 'reported':
-            return Boolean(value);
+            return Number(value);
           case 'createdAt':
             return new Date(Number(value));
           default:
