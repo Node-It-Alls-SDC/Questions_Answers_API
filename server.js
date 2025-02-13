@@ -95,6 +95,7 @@ app.put('/qa/answers/:answer_id/report', (req, res) => {
     .catch(err => res.status(404).send(err))
 })
 
-app.listen(process.env.PORT, () => {
+module.exports = app.listen(process.env.PORT, () => {
   console.log(`QA API listening on port ${process.env.PORT}`)
 })
+

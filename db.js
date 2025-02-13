@@ -5,7 +5,8 @@ const sequelize = new Sequelize(
  'kevinvar',
  '',
   {
-    dialect: 'mysql'
+    dialect: 'mysql',
+    logging: false
   }
 );
 
@@ -46,23 +47,13 @@ Photos.sync();
 module.exports.Questions = Questions;
 module.exports.Answers = Answers;
 module.exports.Photos = Photos;
+module.exports.sequelize = sequelize;
 
 sequelize.authenticate().then(() => {
-   console.log('Connection has been established successfully.');
+  console.log('Connection has been established successfully.');
 }).catch((error) => {
-   console.error('Unable to connect to the database: ', error);
+  console.error('Unable to connect to the database: ', error);
 });
-
-
-
-
-
-
-
-
-
-
-
 // const mongoose = require('mongoose');
 // const {Schema} = mongoose;
 
