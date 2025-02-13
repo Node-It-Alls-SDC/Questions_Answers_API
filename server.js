@@ -44,23 +44,23 @@ app.get('/qa/questions/:question_id/answers', (req, res) => {
 
 //POST Questions
 app.post('/qa/questions', (req, res) => {
-  var ProductId = req.query.product_id
-  if (!ProductId) {
-    return res.status(400).send('Product ID is missing');
-  }
-  if (!req.body || !req.body.body || !req.body.name || !req.body.email) {
+  if (!req.body || !req.body.body || !req.body.name || !req.body.email || !req.body.product_id) {
     return res.status(400).send('Missing one or more fields from the body');
   }
-  res.sendStatus(201);
+  controller.addQuestion(req.body.product_id, req.body.body, req.body.name, req.body.email)
+    .then(result => res.sendStatus(201))
+    .catch(err => res.status(404).send(err))
 })
 
 //POST Answers
 app.post('/qa/questions/:question_id/answers', (req, res) => {
   var QuestionId = req.params.question_id;
-  if (!req.body || !req.body.body || !req.body.name || !req.body.email) {
+  if (!req.body || !req.body.body || !req.body.name || !req.body.email || !req.body.photos) {
     return res.status(400).send('Missing one or more fields from the body');
   }
-  res.sendStatus(201);
+  controller.addAnswer(QuestionId, req.body.body, req.body.name, req.body.email, req.body.photos)
+    .then(result => res.sendStatus(201))
+    .catch(err => res.status(404).send(err))
 })
 
 //Increase helpfulness of Question by 1
