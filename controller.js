@@ -33,5 +33,17 @@ module.exports = {
           return new Promise((resolve, reject) => resolve());
         }
       })
+  },
+  helpfulQuestion: (id) => {
+    return Models.Questions.increment({helpful: 1}, {where: {id}});
+  },
+  reportQuestion: (id) => {
+    return Models.Questions.update({reported: true}, {where: {id}});
+  },
+  helpfulAnswer: (id) => {
+    return Models.Answers.increment({helpful: 1}, {where: {id}});
+  },
+  reportAnswer: (id) => {
+    return Models.Answers.update({reported: true}, {where: {id}});
   }
 }

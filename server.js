@@ -48,7 +48,7 @@ app.post('/qa/questions', (req, res) => {
     return res.status(400).send('Missing one or more fields from the body');
   }
   controller.addQuestion(req.body.product_id, req.body.body, req.body.name, req.body.email)
-    .then(result => res.sendStatus(201))
+    .then(() => res.sendStatus(201))
     .catch(err => res.status(404).send(err))
 })
 
@@ -59,32 +59,40 @@ app.post('/qa/questions/:question_id/answers', (req, res) => {
     return res.status(400).send('Missing one or more fields from the body');
   }
   controller.addAnswer(QuestionId, req.body.body, req.body.name, req.body.email, req.body.photos)
-    .then(result => res.sendStatus(201))
+    .then(() => res.sendStatus(201))
     .catch(err => res.status(404).send(err))
 })
 
 //Increase helpfulness of Question by 1
 app.put('/qa/questions/:question_id/helpful', (req, res) => {
   var id = req.params.question_id;
-  res.sendStatus(204);
+  controller.helpfulQuestion(id)
+    .then(() => res.sendStatus(204))
+    .catch(err => res.status(404).send(err))
 })
 
 //Mark question as reported
 app.put('/qa/questions/:question_id/report', (req, res) => {
   var id = req.params.question_id;
-  res.sendStatus(204);
+  controller.reportQuestion(id)
+    .then(() => res.sendStatus(204))
+    .catch(err => res.status(404).send(err))
 })
 
 //Increase helpfulness of Answer by 1
 app.put('/qa/answers/:answer_id/helpful', (req, res) => {
   var id = req.params.answer_id;
-  res.sendStatus(204);
+  controller.helpfulAnswer(id)
+    .then(() => res.sendStatus(204))
+    .catch(err => res.status(404).send(err))
 })
 
 //Mark answer as reported
 app.put('/qa/answers/:answer_id/report', (req, res) => {
   var id = req.params.answer_id;
-  res.sendStatus(204);
+  controller.reportAnswer(id)
+    .then(() => res.sendStatus(204))
+    .catch(err => res.status(404).send(err))
 })
 
 app.listen(process.env.PORT, () => {
