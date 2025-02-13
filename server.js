@@ -1,7 +1,7 @@
-const express = require('express')
-const app = express()
-require('dotenv').config()
-
+const express = require('express');
+const app = express();
+require('dotenv').config();
+const controller = require('./controller.js');
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -14,18 +14,19 @@ app.get('/qa', (req, res) => {
 
 //GET Questions
 app.get('/qa/questions', (req, res) => {
-  var ProductId = req.query.product_id
-  if (!ProductId) {
+  if (!req.query.product_id) {
     return res.status(400).send('Product ID is missing');
   }
-  res.send('Success!');
+  controller.getQuestions(req.query.product_id, Number(req.query?.page), Number(req.query?.count))
+    .then(result => res.send(result))
+    .catch(err => res.status(404).send(err))
 })
 
 //GET Answers
 app.get('/qa/questions/:question_id/answers', (req, res) => {
-  var QuestionId = req.params.question_id;
-  console.log(QuestionId)
-  res.send('Success!');
+  controller.getAnswers(req.params.question_id, Number(req.query?.page), Number(req.query?.count))
+    .then(result => res.send(result))
+    .catch(err => res.status(404).send(err))
 })
 
 //POST Questions

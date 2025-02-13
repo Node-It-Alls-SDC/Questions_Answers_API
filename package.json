@@ -2,7 +2,9 @@
   "name": "questions_answers_api",
   "description": "API for Questions and Answers section of an E-commerce site using mongoDB and expressJS",
   "scripts": {
-    "start": "nodemon server.js"
+    "start-dev": "nodemon server.js",
+    "start": "node server.js",
+    "build": "node load.js"
   },
   "dependencies": {
     "csv-parser": "^3.2.0",

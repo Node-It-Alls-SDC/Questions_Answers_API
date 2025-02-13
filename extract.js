@@ -7,7 +7,7 @@ const questions = './data/questions.csv';
 const answers = './data/answers.csv';
 const photos = './data/answers_photos.csv';
 
-
+const BATCHSIZE = 20000;
 
 const questionStream = (Questions) => {
   return new Promise ((resolve, reject) => {
@@ -41,7 +41,7 @@ const questionStream = (Questions) => {
     }))
     .on('data', question => {
       questionsData.push(question);
-      if (questionsData.length === 10000) {
+      if (questionsData.length === BATCHSIZE) {
         var inserted = questionsData.slice();
         questionsData = [];
         Questions.bulkCreate(inserted)
@@ -93,7 +93,7 @@ const answerStream = (Answers) => {
     }))
     .on('data', answer => {
       answersData.push(answer);
-      if (answersData.length === 10000) {
+      if (answersData.length === BATCHSIZE) {
         var inserted = answersData.slice();
         answersData = [];
         Answers.bulkCreate(inserted)
@@ -128,7 +128,7 @@ const photoStream = (Photos) => {
     }))
     .on('data', photo => {
       photosData.push(photo);
-      if (photosData.length === 10000) {
+      if (photosData.length === BATCHSIZE) {
         var inserted = photosData.slice();
         photosData = [];
         Photos.bulkCreate(inserted)
