@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const controller = require('./controller.js');
-const {transformQuestion} = require('./transform.js');
+const {transformQuestion, transformAnswer} = require('./transform.js');
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -31,7 +31,14 @@ app.get('/qa/questions', (req, res) => {
 //GET Answers
 app.get('/qa/questions/:question_id/answers', (req, res) => {
   controller.getAnswers(req.params.question_id, Number(req.query?.page), Number(req.query?.count))
-    .then(result => res.send(result))
+    .then(result =>
+      res.send({
+        question: req.params.question_id,
+        page: Number(req.query?.page) ? Number(req.query?.page) : 1,
+        count: Number(req.query?.count) ? Number(req.query?.count) : 5,
+        results: transformAnswer(result)
+      })
+    )
     .catch(err => res.status(404).send(err))
 })
 

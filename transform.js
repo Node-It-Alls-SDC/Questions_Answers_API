@@ -28,3 +28,22 @@ module.exports.transformQuestion = (question) => {
   })
   return formatted
 }
+
+module.exports.transformAnswer = (answer) => {
+  var raw = JSON.parse(JSON.stringify(answer));
+  var formatted = raw.map(answer => {
+    return {
+    answer_id: answer.id,
+    body: answer.body,
+    date: answer.createdAt,
+    answerer_name: answer.answerer_name,
+    helpfulness: answer.helpful,
+    photos: answer.Photos.map(photo => {
+      return {
+        id: photo.id,
+        url: photo.url
+      }
+    })}
+  })
+  return formatted
+}
