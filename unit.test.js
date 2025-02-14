@@ -2,7 +2,7 @@ var app = require('./server.js');
 var request = require('supertest');
 var expect = require('chai').expect;
 
-describe('QA API', () => {
+describe('QA API Unit Tests', () => {
 
   describe('GET /', () => {
     it('should return 200 OK and text to direct you in the right direction', () => {
