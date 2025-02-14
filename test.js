@@ -2,7 +2,7 @@ var app = require('./server.js');
 var request = require('supertest');
 var expect = require('chai').expect;
 
-describe('Testing API Calls', () => {
+describe('QA API', () => {
 
   describe('GET /', () => {
     it('should return 200 OK and text to direct you in the right direction', () => {
@@ -299,4 +299,149 @@ describe('Testing API Calls', () => {
         .expect(404)
     })
   })
+
+  describe('PUT /qa/questions/:question_id/helpful', () => {
+
+    it('Should return 204 No Content and mark a question as helpful', () => {
+      return request(app)
+        .put('/qa/questions/1156/helpful')
+        .expect(204)
+    })
+
+    it('Should throw an error if given invalid question id', () => {
+      return request(app)
+        .put('/qa/questions/0/helpful')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(404)
+        .then((err) => {
+          expect(err.text).to.equal('Invalid QuestionId');
+          return request(app)
+            .put('/qa/questions/4294967296/helpful')
+            .set('Accept', 'text/html')
+            .expect('Content-Type', /text/)
+            .expect(404)
+            .then((err) => {
+              expect(err.text).to.equal('Invalid QuestionId');
+              return request(app)
+                .put('/qa/questions/fhasfhdsj/helpful')
+                .set('Accept', 'text/html')
+                .expect('Content-Type', /text/)
+                .expect(404)
+                .then((err) => {
+                  expect(err.text).to.equal('Invalid QuestionId')
+                })
+            })
+        })
+    });
+  })
+
+  describe('PUT /qa/questions/:question_id/report', () => {
+
+    it('Should return 204 No Content and mark a question as reported', () => {
+      return request(app)
+        .put('/qa/questions/124/report')
+        .expect(204)
+    })
+
+    it('Should throw an error if given invalid question id', () => {
+      return request(app)
+        .put('/qa/questions/0/report')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(404)
+        .then((err) => {
+          expect(err.text).to.equal('Invalid QuestionId');
+          return request(app)
+            .put('/qa/questions/4294967296/report')
+            .set('Accept', 'text/html')
+            .expect('Content-Type', /text/)
+            .expect(404)
+            .then((err) => {
+              expect(err.text).to.equal('Invalid QuestionId');
+              return request(app)
+                .put('/qa/questions/fhasfhdsj/report')
+                .set('Accept', 'text/html')
+                .expect('Content-Type', /text/)
+                .expect(404)
+                .then((err) => {
+                  expect(err.text).to.equal('Invalid QuestionId')
+                })
+            })
+        })
+    });
+  })
+
+  describe('PUT /qa/answers/:answer_id/helpful', () => {
+
+    it('Should return 204 No Content and mark a answer as helpful', () => {
+      return request(app)
+        .put('/qa/answers/56/helpful')
+        .expect(204)
+    })
+
+    it('Should throw an error if given invalid answer id', () => {
+      return request(app)
+        .put('/qa/answers/0/helpful')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(404)
+        .then((err) => {
+          expect(err.text).to.equal('Invalid AnswerId');
+          return request(app)
+            .put('/qa/answers/4294967296/helpful')
+            .set('Accept', 'text/html')
+            .expect('Content-Type', /text/)
+            .expect(404)
+            .then((err) => {
+              expect(err.text).to.equal('Invalid AnswerId');
+              return request(app)
+                .put('/qa/answers/fhasfhdsj/helpful')
+                .set('Accept', 'text/html')
+                .expect('Content-Type', /text/)
+                .expect(404)
+                .then((err) => {
+                  expect(err.text).to.equal('Invalid AnswerId')
+                })
+            })
+        })
+    });
+  })
+
+  describe('PUT /qa/answers/:answer_id/report', () => {
+
+    it('Should return 204 No Content and mark a answer as reported', () => {
+      return request(app)
+        .put('/qa/answers/74/report')
+        .expect(204)
+    })
+
+    it('Should throw an error if given invalid answer id', () => {
+      return request(app)
+        .put('/qa/answers/0/report')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(404)
+        .then((err) => {
+          expect(err.text).to.equal('Invalid AnswerId');
+          return request(app)
+            .put('/qa/answers/4294967296/report')
+            .set('Accept', 'text/html')
+            .expect('Content-Type', /text/)
+            .expect(404)
+            .then((err) => {
+              expect(err.text).to.equal('Invalid AnswerId');
+              return request(app)
+                .put('/qa/answers/fhasfhdsj/report')
+                .set('Accept', 'text/html')
+                .expect('Content-Type', /text/)
+                .expect(404)
+                .then((err) => {
+                  expect(err.text).to.equal('Invalid AnswerId')
+                })
+            })
+        })
+    });
+  })
+
 });
