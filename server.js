@@ -50,11 +50,17 @@ app.get('/qa/questions/:question_id/answers', (req, res) => {
 
 //POST Questions
 app.post('/qa/questions', (req, res) => {
+  if (!req.body.product_id) {
+    return res.status(400).send('ProductId is missing');
+  }
   if (isNaN(Number(req.body.product_id)) || req.body.product_id <= 0 || req.body.product_id > 4294967295) {
     return res.status(404).send('Invalid ProductId')
   }
-  if (!req.body || !req.body.body || !req.body.name || !req.body.email || !req.body.product_id) {
+  if (!req.body || !req.body.body || !req.body.name || !req.body.email) {
     return res.status(400).send('Missing one or more fields from the body');
+  }
+  if (typeof req.body.body !== 'string' || typeof req.body.email !== 'string' || typeof req.body.name !== 'string') {
+    return res.status(404).send('Invalid Form');
   }
   controller.addQuestion(req.body.product_id, req.body.body, req.body.name, req.body.email)
     .then(() => res.sendStatus(201))
@@ -64,10 +70,13 @@ app.post('/qa/questions', (req, res) => {
 //POST Answers
 app.post('/qa/questions/:question_id/answers', (req, res) => {
   if (isNaN(Number(req.params.question_id)) || req.params.question_id <= 0 || req.params.question_id > 4294967295) {
-    return res.status(404).send('Invalid QuestionId')
+    return res.status(404).send('Invalid QuestionId');
   }
   if (!req.body || !req.body.body || !req.body.name || !req.body.email || !req.body.photos) {
     return res.status(400).send('Missing one or more fields from the body');
+  }
+  if (typeof req.body.body !== 'string' || typeof req.body.email !== 'string' || typeof req.body.name !== 'string' || !Array.isArray(req.body.photos)) {
+    return res.status(404).send('Invalid Form');
   }
   controller.addAnswer(req.params.question_id, req.body.body, req.body.name, req.body.email, req.body.photos)
     .then(() => res.sendStatus(201))

@@ -31,7 +31,7 @@ describe('Testing API Calls', () => {
   });
 
   describe('GET /qa/questions', () => {
-    it('Should get all the questions at product id 1 and they should be formatted correctly', () => {
+    it('Should return 200 OK and get all the questions at product id 1 and they should be formatted correctly', () => {
       return request(app)
         .get('/qa/questions?product_id=1')
         .set('Accept', 'application/json')
@@ -47,18 +47,18 @@ describe('Testing API Calls', () => {
           expect(response.body.results[0].question_helpfulness).to.be.a('number');
           expect(response.body.results[0].reported).to.be.false;
           expect(response.body.results[0].answers).to.be.a('object');
-          expect(response.body.results[0].answers[Object.keys(response.body.results[0].answers)[Object.keys(response.body.results[0].answers).length - 1]].id).to.equal(Number(Object.keys(response.body.results[0].answers)[Object.keys(response.body.results[0].answers).length - 1]))
-          expect(response.body.results[0].answers[Object.keys(response.body.results[0].answers)[Object.keys(response.body.results[0].answers).length - 1]].body).to.be.a('string');
-          expect(!isNaN(Date.parse(response.body.results[0].answers[Object.keys(response.body.results[0].answers)[Object.keys(response.body.results[0].answers).length - 1]].date))).to.be.true;
-          expect(response.body.results[0].answers[Object.keys(response.body.results[0].answers)[Object.keys(response.body.results[0].answers).length - 1]].answerer_name).to.be.a('string');
-          expect(response.body.results[0].answers[Object.keys(response.body.results[0].answers)[Object.keys(response.body.results[0].answers).length - 1]].helpfulness).to.be.a('number');
-          expect(response.body.results[0].answers[Object.keys(response.body.results[0].answers)[Object.keys(response.body.results[0].answers).length - 1]].photos).to.be.a('array');
-          expect(response.body.results[0].answers[Object.keys(response.body.results[0].answers)[Object.keys(response.body.results[0].answers).length - 1]].photos[0].id).to.be.a('number');
-          expect(response.body.results[0].answers[Object.keys(response.body.results[0].answers)[Object.keys(response.body.results[0].answers).length - 1]].photos[0].url).to.be.a('string');
+          expect(response.body.results[1].answers[Object.keys(response.body.results[1].answers)[Object.keys(response.body.results[1].answers).length - 1]].id).to.equal(Number(Object.keys(response.body.results[1].answers)[Object.keys(response.body.results[1].answers).length - 1]))
+          expect(response.body.results[1].answers[Object.keys(response.body.results[1].answers)[Object.keys(response.body.results[1].answers).length - 1]].body).to.be.a('string');
+          expect(!isNaN(Date.parse(response.body.results[1].answers[Object.keys(response.body.results[1].answers)[Object.keys(response.body.results[1].answers).length - 1]].date))).to.be.true;
+          expect(response.body.results[1].answers[Object.keys(response.body.results[1].answers)[Object.keys(response.body.results[1].answers).length - 1]].answerer_name).to.be.a('string');
+          expect(response.body.results[1].answers[Object.keys(response.body.results[1].answers)[Object.keys(response.body.results[1].answers).length - 1]].helpfulness).to.be.a('number');
+          expect(response.body.results[1].answers[Object.keys(response.body.results[1].answers)[Object.keys(response.body.results[1].answers).length - 1]].photos).to.be.a('array');
+          expect(response.body.results[1].answers[Object.keys(response.body.results[1].answers)[Object.keys(response.body.results[1].answers).length - 1]].photos[1].id).to.be.a('number');
+          expect(response.body.results[1].answers[Object.keys(response.body.results[1].answers)[Object.keys(response.body.results[1].answers).length - 1]].photos[1].url).to.be.a('string');
         })
     });
 
-    it('Should throw an error if given product id is invalid', () => {
+    it('Should throw an error if given invalid product id', () => {
       return request(app)
         .get('/qa/questions?product_id=0')
         .set('Accept', 'text/html')
@@ -99,7 +99,7 @@ describe('Testing API Calls', () => {
 
   describe('GET /qa/questions/:question_id/answers', () => {
 
-    it('Should get all the answers at question id 1 and they should be formatted correctly', () => {
+    it('Should return 200 OK and get all the answers at question id 1 and they should be formatted correctly', () => {
       return request(app)
         .get('/qa/questions/1/answers')
         .set('Accept', 'application/json')
@@ -121,7 +121,7 @@ describe('Testing API Calls', () => {
         })
     });
 
-    it('Should throw an error if given question id is invalid', () => {
+    it('Should throw an error if given invalid question id', () => {
       return request(app)
         .get('/qa/questions/0/answers')
         .set('Accept', 'text/html')
@@ -151,8 +151,152 @@ describe('Testing API Calls', () => {
   });
 
   describe('POST /qa/questions', () => {
-    it('Should create a question if given valid fields', () => {
 
+    it('Should return 201 Created and create a question if given valid fields', () => {
+      var question = {
+        body: 'This is a supertest',
+        name: 'Supertest',
+        email: 'supertest@supertest.com',
+        product_id: '10'
+      }
+      return request(app)
+        .post('/qa/questions')
+        .send(question)
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(201)
+    })
+
+    it('Should throw an error if missing fields', () => {
+      var question = {
+        name: 'Invalid',
+        product_id: '3'
+      }
+      return request(app)
+        .post('/qa/questions')
+        .send(question)
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(400)
+        .then(err => expect(err.text).to.equal('Missing one or more fields from the body'))
+    })
+
+    it('Should throw an error if given invalid product id', () => {
+      return request(app)
+        .post('/qa/questions')
+        .send({product_id: '0'})
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(404)
+        .then((err) => {
+          expect(err.text).to.equal('Invalid ProductId');
+          return request(app)
+            .post('/qa/questions')
+            .send({product_id: '4294967296'})
+            .set('Accept', 'text/html')
+            .expect('Content-Type', /text/)
+            .expect(404)
+            .then((err) => {
+              expect(err.text).to.equal('Invalid ProductId');
+              return request(app)
+                .post('/qa/questions')
+                .send({product_id: 'fhasfhdsj'})
+                .set('Accept', 'text/html')
+                .expect('Content-Type', /text/)
+                .expect(404)
+                .then((err) => {
+                  expect(err.text).to.equal('Invalid ProductId')
+                })
+            })
+        })
+    });
+
+    it('should throw an error for any invalid data types for the rest of the fields', () => {
+      var question = {
+        body: {},
+        name: [],
+        email: 453535,
+        product_id: '10'
+      }
+      return request(app)
+        .post('/qa/questions')
+        .send(question)
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(404)
+    })
+  })
+
+  describe('POST /qa/questions/:question_id/answers', () => {
+
+    it('Should return 201 Created and create an answer if given valid fields', () => {
+      var question = {
+        body: 'This is a supertest',
+        name: 'Supertest',
+        email: 'supertest@supertest.com',
+        photos: []
+      }
+      return request(app)
+        .post('/qa/questions/10/answers')
+        .send(question)
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(201)
+    })
+
+    it('Should throw an error if missing fields', () => {
+      var question = {
+        name: 'Invalid'
+      }
+      return request(app)
+        .post('/qa/questions/1/answers')
+        .send(question)
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(400)
+        .then(err => expect(err.text).to.equal('Missing one or more fields from the body'))
+    })
+
+    it('Should throw an error if given invalid question id', () => {
+      return request(app)
+        .post('/qa/questions/0/answers')
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(404)
+        .then((err) => {
+          expect(err.text).to.equal('Invalid QuestionId');
+          return request(app)
+            .post('/qa/questions/4294967296/answers')
+            .set('Accept', 'text/html')
+            .expect('Content-Type', /text/)
+            .expect(404)
+            .then((err) => {
+              expect(err.text).to.equal('Invalid QuestionId');
+              return request(app)
+                .post('/qa/questions/fhasfhdsj/answers')
+                .set('Accept', 'text/html')
+                .expect('Content-Type', /text/)
+                .expect(404)
+                .then((err) => {
+                  expect(err.text).to.equal('Invalid QuestionId')
+                })
+            })
+        })
+    });
+
+    it('should throw an error for any invalid data types for the rest of the fields', () => {
+      var question = {
+        body: {},
+        name: [],
+        email: 453535,
+        photos: 123453
+      }
+      return request(app)
+        .post('/qa/questions/1/answers')
+        .send(question)
+        .set('Accept', 'text/html')
+        .expect('Content-Type', /text/)
+        .expect(404)
     })
   })
 });
