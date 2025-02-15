@@ -2,9 +2,9 @@
 // dbname.getCollection("Questions");
 const fs = require('fs');
 const csv = require('csv-parser');
-const questions = '../../data/questions.csv';
-const answers = '../../data/answers.csv';
-const photos = '../../data/answers_photos.csv';
+const questions = './data/questions.csv';
+const answers = './data/answers.csv';
+const photos = './data/answers_photos.csv';
 
 const BATCHSIZE = 20000;
 
@@ -15,22 +15,25 @@ const questionStream = (Questions) => {
     .pipe(csv({
       mapHeaders: ({ header, index }) => {
         switch (header) {
+          case 'id':
+          case 'body':
+            return 'question_' + header
           case 'date_written':
-            return 'createdAt';
-          case 'product_id':
-            return 'ProductId';
+            return 'question_date'
+          case 'helpful':
+            return 'question_helpfulness'
           default:
             return header;
         }
       },
       mapValues: ({ header, index, value}) => {
         switch (header) {
-          case 'id':
-          case 'ProductId':
-          case 'helpful':
+          case 'question_id':
+          case 'product_id':
+          case 'question_helpfulness':
           case 'reported':
             return Number(value);
-          case 'createdAt':
+          case 'question_date':
             return new Date(Number(value));
           default:
             return value;
@@ -66,22 +69,24 @@ const answerStream = (Answers) => {
     .pipe(csv({
       mapHeaders: ({ header, index }) => {
         switch (header) {
-          case 'question_id':
-            return 'QuestionId';
+          case 'id':
+            return 'answer_id';
           case 'date_written':
-            return 'createdAt';
+            return 'date';
+          case 'helpful':
+            return 'helpfulness'
           default:
             return header;
         }
       },
       mapValues: ({ header, index, value}) => {
         switch (header) {
-          case 'id':
-          case 'QuestionId':
-          case 'helpful':
+          case 'answer_id':
+          case 'question_id':
+          case 'helpfulness':
           case 'reported':
             return Number(value);
-          case 'createdAt':
+          case 'date':
             return new Date(Number(value));
           default:
             return value;
@@ -113,16 +118,7 @@ const photoStream = (Photos) => {
   return new Promise ((resolve, reject) => {
     var photosData = [];
     fs.createReadStream(photos)
-    .pipe(csv({
-      mapHeaders: ({ header, index }) => {
-        switch (header) {
-          case 'answer_id':
-            return 'AnswerId';
-          default:
-            return header;
-        }
-      }
-    }))
+    .pipe(csv())
     .on('data', photo => {
       photosData.push(photo);
       if (photosData.length === BATCHSIZE) {

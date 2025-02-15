@@ -1,31 +1,30 @@
 const Models = require('./db.js');
 
 module.exports = {
-  getQuestions: (ProductId, page, count) => {
+  getQuestions: (product_id, page, count) => {
     page = page ? page : 1;
     count = count ? count : 5;
-    return Models.Questions.findAll({offset: ((page - 1) * count), limit: count, where: {ProductId, reported: false}, include: [{model: Models.Answers, where: {reported: false}, required: false, include: [{model: Models.Photos, required: false}]}], order: [['helpful', 'DESC'], [{model: Models.Answers}, 'helpful', 'DESC']]
+    return Models.Questions.findAll({offset: ((page - 1) * count), limit: count, where: {product_id, reported: false}, include: [{model: Models.Answers, where: {reported: false}, required: false, include: [{model: Models.Photos, required: false}]}], order: [['question_helpfulness', 'DESC'], [{model: Models.Answers}, 'helpfulness', 'DESC']]
     })
   },
-  getAnswers: (QuestionId, page, count) => {
+  getAnswers: (question_id, page, count) => {
     page = page ? page : 1;
     count = count ? count : 5;
     return Models.Answers.findAll({
-      offset: ((page - 1) * count), limit: count, where: {QuestionId, reported: false}, include: [{model: Models.Photos, required: false}], order: [['helpful', 'DESC']]
+      offset: ((page - 1) * count), limit: count, where: {question_id, reported: false}, include: [{model: Models.Photos, required: false}], order: [['helpfulness', 'DESC']]
     })
   },
-  addQuestion: (ProductId, body, asker_name, asker_email) => {
-    return Models.Questions.create({ProductId, body, asker_name, asker_email})
+  addQuestion: (product_id, question_body, asker_name, asker_email) => {
+    return Models.Questions.create({product_id, question_body, asker_name, asker_email})
   },
-  addAnswer: (QuestionId, body, answerer_name, answerer_email, photos) => {
-    return Models.Answers.create({QuestionId, body, answerer_name, answerer_email})
+  addAnswer: (question_id, body, answerer_name, answerer_email, photos) => {
+    return Models.Answers.create({question_id, body, answerer_name, answerer_email})
       .then((res) => {
-        var raw = JSON.parse(JSON.stringify(res));
         if (photos.length > 0) {
           var inserted = photos.map(photo => {
             return {
               url: photo,
-              AnswerId: raw.id
+              answer_id: res.id
             }
           })
           return Models.Photos.bulkCreate(inserted);
@@ -34,16 +33,16 @@ module.exports = {
         }
       })
   },
-  helpfulQuestion: (id) => {
-    return Models.Questions.increment({helpful: 1}, {where: {id}});
+  helpfulQuestion: (question_id) => {
+    return Models.Questions.increment({question_helpfulness: 1}, {where: {question_id}});
   },
-  reportQuestion: (id) => {
-    return Models.Questions.update({reported: true}, {where: {id}});
+  reportQuestion: (question_id) => {
+    return Models.Questions.update({reported: true}, {where: {question_id}});
   },
-  helpfulAnswer: (id) => {
-    return Models.Answers.increment({helpful: 1}, {where: {id}});
+  helpfulAnswer: (answer_id) => {
+    return Models.Answers.increment({helpfulness: 1}, {where: {answer_id}});
   },
-  reportAnswer: (id) => {
-    return Models.Answers.update({reported: true}, {where: {id}});
+  reportAnswer: (answer_id) => {
+    return Models.Answers.update({reported: true}, {where: {answer_id}});
   }
 }

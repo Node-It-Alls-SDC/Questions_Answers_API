@@ -6,48 +6,57 @@ const sequelize = new Sequelize(
  '',
   {
     dialect: 'mysql',
-    logging: false
+    logging: false,
+    define: {
+      underscored: true,
+    }
   }
 );
 
-const Questions = sequelize.define('Questions', {
-    ProductId: { type: DataTypes.INTEGER, index: true, allowNull: false},
-    body: {type: DataTypes.STRING(1000), allowNull: false},
+const questions = sequelize.define('Questions', {
+    question_id: { type: DataTypes.INTEGER, allowNull: false, autoIncrement: true, primaryKey: true},
+    product_id: { type: DataTypes.INTEGER, index: true, allowNull: false},
+    question_body: {type: DataTypes.STRING(1000), allowNull: false},
     asker_name: {type: DataTypes.STRING(60), allowNull: false},
     asker_email: {type: DataTypes.STRING(60), allowNull: false},
     reported: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
-    helpful: {type: DataTypes.INTEGER, allowNull: false, defaultValue: 0}
+    question_helpfulness: {type: DataTypes.INTEGER, allowNull: false, defaultValue: 0}
   },
   {
-    indexes:[{unique: false, fields:['ProductId']}]
+    createdAt: 'question_date',
+    indexes:[{unique: false, fields:['product_id']}]
   }
 );
 
-const Answers = sequelize.define('Answers', {
+const answers = sequelize.define('Answers', {
+  answer_id: { type: DataTypes.INTEGER, allowNull: false, autoIncrement: true, primaryKey: true },
   body: {type: DataTypes.STRING(1000), allowNull: false},
   answerer_name: {type: DataTypes.STRING(60), allowNull: false},
   answerer_email: {type: DataTypes.STRING(60), allowNull: false},
   reported: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
-  helpful: {type: DataTypes.INTEGER, allowNull: false, defaultValue: 0},
-});
+  helpfulness: {type: DataTypes.INTEGER, allowNull: false, defaultValue: 0},
+  },
+  {
+    createdAt: 'date'
+  }
+);
 
-const Photos = sequelize.define('Photos', {
+const photos = sequelize.define('Photos', {
   url: {type: DataTypes.STRING(), allowNull: false},
 });
 
-Questions.hasMany(Answers);
-Answers.belongsTo(Questions);
-Answers.hasMany(Photos);
-Photos.belongsTo(Answers);
+questions.hasMany(answers, {foreignKey: 'question_id'});
+answers.belongsTo(questions, {foreignKey: 'question_id'});
+answers.hasMany(photos, {foreignKey: 'answer_id'});
+photos.belongsTo(answers, {foreignKey: 'answer_id'});
 
-Questions.sync();
-Answers.sync();
-Photos.sync();
+questions.sync();
+answers.sync();
+photos.sync();
 
-module.exports.Questions = Questions;
-module.exports.Answers = Answers;
-module.exports.Photos = Photos;
-module.exports.sequelize = sequelize;
+module.exports.Questions = questions;
+module.exports.Answers = answers;
+module.exports.Photos = photos;
 
 sequelize.authenticate().then(() => {
   //console.log('Connection has been established successfully.');
