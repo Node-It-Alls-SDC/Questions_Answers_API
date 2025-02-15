@@ -1,4 +1,4 @@
-const Models = require('./db.js');
+const Models = require('../db.js');
 const {questionStream, answerStream, photoStream} = require('./extract.js');
 
 questionStream(Models.Questions)

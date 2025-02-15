@@ -2,10 +2,9 @@
 // dbname.getCollection("Questions");
 const fs = require('fs');
 const csv = require('csv-parser');
-
-const questions = './data/questions.csv';
-const answers = './data/answers.csv';
-const photos = './data/answers_photos.csv';
+const questions = '../../data/questions.csv';
+const answers = '../../data/answers.csv';
+const photos = '../../data/answers_photos.csv';
 
 const BATCHSIZE = 20000;
 

@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const controller = require('./controller.js');
-const {transformQuestion, transformAnswer} = require('./transform.js');
+const {transformQuestion, transformAnswer} = require('./utils/transform.js');
 app.use(express.json());
 
 app.get('/', (req, res) => {
