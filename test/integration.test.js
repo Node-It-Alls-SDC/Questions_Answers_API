@@ -55,6 +55,7 @@ describe('QA API Integration Tests', () => {
               expect(response.body.results[response.body.results.length - 1].body).to.equal('This is a integration test');
               expect(response.body.results[response.body.results.length - 1].answerer_name).to.equal('Supertest');
               expect(response.body.results[response.body.results.length - 1].helpfulness).to.equal(0);
+              expect(response.body.results[response.body.results.length - 1].photos[0].url).to.equal('supertest.png');
             })
         })
     })

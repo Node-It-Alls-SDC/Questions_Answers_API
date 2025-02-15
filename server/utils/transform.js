@@ -25,19 +25,13 @@ module.exports.transformQuestion = (question) => {
 
 module.exports.transformAnswer = (answer) => {
   var raw = JSON.parse(JSON.stringify(answer));
-  var formatted = raw.map(answer => {
-    return {
-    answer_id: answer.answer_id,
-    body: answer.body,
-    date: answer.date,
-    answerer_name: answer.answerer_name,
-    helpfulness: answer.helpfulness,
-    photos: answer.Photos.map(photo => {
-      return {
-        id: photo.id,
-        url: photo.url
-      }
-    })}
-  })
-  return formatted
+    for (var i = 0; i < raw.length; i++) {
+      delete raw[i].updatedAt;
+      delete raw[i].reported;
+      raw[i]['photos'] = raw[i].Photos.map(photo => {
+        return { id: photo.id, url: photo.url }
+      })
+      delete raw[i].Photos;
+    }
+  return raw
 }

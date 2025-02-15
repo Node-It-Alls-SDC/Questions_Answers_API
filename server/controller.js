@@ -24,7 +24,7 @@ module.exports = {
           var inserted = photos.map(photo => {
             return {
               url: photo,
-              answer_id: res.id
+              answer_id: res.answer_id
             }
           })
           return Models.Photos.bulkCreate(inserted);
