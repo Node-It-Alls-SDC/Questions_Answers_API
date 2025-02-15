@@ -39,7 +39,7 @@ describe('QA API Unit Tests', () => {
         .expect(200)
         .then(response => {
           expect(response.body.product_id).to.equal(1);
-          expect(response.body.results.length).to.not.equal(0);
+          expect(response.body.results.length).to.equal(5);
           expect(response.body.results[0].question_id).to.be.a('number');
           expect(response.body.results[0].question_body).to.be.a('string');
           expect(!isNaN(Date.parse(response.body.results[0].question_date))).to.be.true;
@@ -109,7 +109,7 @@ describe('QA API Unit Tests', () => {
           expect(response.body.question).to.equal(1);
           expect(response.body.page).to.equal(1);
           expect(response.body.count).to.equal(5);
-          expect(response.body.results.length).to.not.equal(0);
+          expect(response.body.results.length).to.equal(5);
           expect(response.body.results[0].answer_id).to.be.a('number');
           expect(response.body.results[0].body).to.be.a('string');
           expect(!isNaN(Date.parse(response.body.results[0].date))).to.be.true;
@@ -230,7 +230,7 @@ describe('QA API Unit Tests', () => {
   describe('POST /qa/questions/:question_id/answers', () => {
 
     it('Should return 201 Created and create an answer if given valid fields', () => {
-      var question = {
+      var answer = {
         body: 'This is a supertest',
         name: 'Supertest',
         email: 'supertest@supertest.com',
@@ -238,19 +238,19 @@ describe('QA API Unit Tests', () => {
       }
       return request(app)
         .post('/qa/questions/10/answers')
-        .send(question)
+        .send(answer)
         .set('Accept', 'text/html')
         .expect('Content-Type', /text/)
         .expect(201)
     })
 
     it('Should throw an error if missing fields', () => {
-      var question = {
+      var answer = {
         name: 'Invalid'
       }
       return request(app)
         .post('/qa/questions/1/answers')
-        .send(question)
+        .send(answer)
         .set('Accept', 'text/html')
         .expect('Content-Type', /text/)
         .expect(400)
@@ -285,7 +285,7 @@ describe('QA API Unit Tests', () => {
     });
 
     it('should throw an error for any invalid data types for the rest of the fields', () => {
-      var question = {
+      var answer = {
         body: {},
         name: [],
         email: 453535,
@@ -293,7 +293,7 @@ describe('QA API Unit Tests', () => {
       }
       return request(app)
         .post('/qa/questions/1/answers')
-        .send(question)
+        .send(answer)
         .set('Accept', 'text/html')
         .expect('Content-Type', /text/)
         .expect(404)
@@ -374,7 +374,7 @@ describe('QA API Unit Tests', () => {
 
   describe('PUT /qa/answers/:answer_id/helpful', () => {
 
-    it('Should return 204 No Content and mark a answer as helpful', () => {
+    it('Should return 204 No Content and mark an answer as helpful', () => {
       return request(app)
         .put('/qa/answers/56/helpful')
         .expect(204)
@@ -410,7 +410,7 @@ describe('QA API Unit Tests', () => {
 
   describe('PUT /qa/answers/:answer_id/report', () => {
 
-    it('Should return 204 No Content and mark a answer as reported', () => {
+    it('Should return 204 No Content and mark an answer as reported', () => {
       return request(app)
         .put('/qa/answers/74/report')
         .expect(204)

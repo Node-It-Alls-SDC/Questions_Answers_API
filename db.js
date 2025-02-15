@@ -50,39 +50,7 @@ module.exports.Photos = Photos;
 module.exports.sequelize = sequelize;
 
 sequelize.authenticate().then(() => {
-  console.log('Connection has been established successfully.');
+  //console.log('Connection has been established successfully.');
 }).catch((error) => {
   console.error('Unable to connect to the database: ', error);
 });
-// const mongoose = require('mongoose');
-// const {Schema} = mongoose;
-
-// mongoose.connect('mongodb://127.0.0.1:27017/Question');
-
-// const AnswerSchema = new Schema({
-//   _id: Number,
-//   question_id: { type: Number, index: true},
-//   body: String,
-//   answerer: String,
-//   answerer_email: String,
-//   reported: Boolean,
-//   helpful: Number,
-//   photos: [String]
-// })
-// const QuestionSchema = new Schema({
-//   _id: Number,
-//   product_id: { type: Number, index: true},
-//   body: String,
-//   asker_name: String,
-//   asker_email: String,
-//   reported: Boolean,
-//   helpful: Number,
-//   Answer: {
-//     type: AnswerSchema,
-//     default: {}
-//   }
-// })
-
-// const QuestionModel = mongoose.model('Question', QuestionSchema);
-
-// module.exports = QuestionModel;
