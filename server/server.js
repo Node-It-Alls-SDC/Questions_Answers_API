@@ -28,7 +28,9 @@ app.get('/qa/questions', (req, res) => {
         results: transformQuestion(result)
       })
     })
-    .catch(err => res.status(500).send(err))
+    .catch(err => {
+      res.status(500).send(err)
+    })
 })
 
 //GET Answers
@@ -45,7 +47,10 @@ app.get('/qa/questions/:question_id/answers', (req, res) => {
         results: transformAnswer(result)
       })
     )
-    .catch(err => res.status(500).send(err))
+    .catch(err => {
+      console.error(err)
+      res.status(500).send(err)
+    })
 })
 
 //POST Questions
