@@ -27,7 +27,7 @@ const questions = sequelize.define('Questions', {
     createdAt: 'question_date',
     cache: true,
     cacheExpiration: 60000,
-    indexes:[{unique:false, fields:['product_id'], where:{reported:false}}, {unique: false, fields:['question_helpfulness'], where:{reported:false}}]
+    indexes:[{unique:false, fields:['product_id'], where:{reported:false}}]
   }
 );
 
@@ -40,7 +40,6 @@ const answers = sequelize.define('Answers', {
     helpfulness: {type: DataTypes.INTEGER, allowNull: false, defaultValue: 0},
   },
   {
-    indexes:[{unique: false, fields:['helpfulness'], where:{reported:false}}],
     cache: true,
     cacheExpiration: 60000,
     updatedAt:  false,
