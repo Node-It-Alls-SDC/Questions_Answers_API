@@ -8,14 +8,3 @@ module.exports.transformQuestion = (question) => {
   return raw
 }
 
-module.exports.transformAnswer = (answer) => {
-  var raw = JSON.parse(JSON.stringify(answer));
-    for (var i = 0; i < raw.length; i++) {
-      delete raw[i].updatedAt;
-      delete raw[i].reported;
-      raw[i]['photos'] = raw[i].photos.map(photo => {
-        return { id: photo.id, url: photo.url }
-      })
-    }
-  return raw
-}

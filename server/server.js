@@ -35,16 +35,19 @@ app.get('/qa/questions', (req, res) => {
 
 //GET Answers
 app.get('/qa/questions/:question_id/answers', (req, res) => {
-  if (isNaN(Number(req.params.question_id)) || req.params.question_id <= 0 || req.params.question_id > 4294967295) {
+  var question_id = Number(req.params.question_id)
+  var page = Number(req.query?.page) ? Number(req.query?.page) : 1
+  var count = Number(req.query?.count) ? Number(req.query?.count) : 5
+  if (isNaN(question_id) || question_id <= 0 || question_id > 4294967295) {
     return res.status(404).send('Invalid QuestionId')
   }
-  controller.getAnswers(req.params.question_id, Number(req.query?.page), Number(req.query?.count))
+  controller.getAnswers(question_id, page, count)
     .then(result =>
       res.send({
         question: Number(req.params.question_id),
         page: Number(req.query?.page) ? Number(req.query?.page) : 1,
         count: Number(req.query?.count) ? Number(req.query?.count) : 5,
-        results: transformAnswer(result)
+        results: result
       })
     )
     .catch(err => {
