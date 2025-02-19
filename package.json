@@ -5,7 +5,8 @@
     "start-dev": "nodemon server/server.js",
     "start": "node server/server.js",
     "build": "node server/utils/load.js",
-    "test": "mocha"
+    "test": "mocha",
+    "artillery": "artillery run test/load-test.yml --record --key a9_siz0VoZz9rLdgqVun2wzeOYI0pOr7O3T"
   },
   "dependencies": {
     "csv-parser": "^3.2.0",

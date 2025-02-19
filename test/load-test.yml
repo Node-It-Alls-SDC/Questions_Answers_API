@@ -1,0 +1,53 @@
+config:
+  # This is a test server run by team Artillery
+  # It's designed to be highly scalable
+  target: http://localhost:3000
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      rampTo: 1
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 10
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 10
+      rampTo: 100
+      name: Spike phase
+    # - duration: 30
+    #   arrivalRate: 5
+    #   rampTo: 1000
+    #   name: Crash phase
+  # Load & configure a couple of useful plugins
+  # https://docs.art/reference/extensions
+  apdex: 2000
+scenarios:
+  - name: Get Questions
+    flow:
+      - loop:
+          - get:
+              url: '/qa/questions?product_id=1'
+          - get:
+              url: '/qa/questions?product_id=250000'
+          - get:
+              url: '/qa/questions?product_id=500000'
+          - get:
+              url: '/qa/questions?product_id=750000'
+          - get:
+              url: '/qa/questions?product_id=1000011'
+        count: 20
+  - name: Get Answers
+    flow:
+      - loop:
+          - get:
+              url: '/qa/questions/1/answers'
+          - get:
+              url: '/qa/questions/875000/answers'
+          - get:
+              url: '/qa/questions/1750000/answers'
+          - get:
+              url: '/qa/questions/2625000/answers'
+          - get:
+              url: '/qa/questions/3518962/answers'
+        count: 20

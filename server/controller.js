@@ -9,7 +9,7 @@ module.exports = {
   },
   getAnswers: (question_id, page, count) => {
     return Models.Answers.findAll({
-      offset: ((page - 1) * count), limit: count, attributes: {exclude: ['answerer_email', 'question_id']},where: {question_id, reported: false}, include: [{model: Models.Photos, as: 'photos', required: false}], order: [['helpfulness', 'DESC']]
+      offset: ((page - 1) * count), limit: count, attributes: {exclude: ['answerer_email', 'question_id', 'reported']},where: {question_id, reported: false}, include: [{model: Models.Photos, as: 'photos', attributes:{exclude:['answer_id']}, required: false}], order: [['helpfulness', 'DESC']]
     })
   },
   addQuestion: (product_id, question_body, asker_name, asker_email) => {

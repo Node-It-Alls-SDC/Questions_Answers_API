@@ -6,7 +6,7 @@ const sequelize = new Sequelize(
  '',
   {
     dialect: 'mysql',
-    // logging: false,
+    logging: false,
     define: {
       underscored: true,
     }
