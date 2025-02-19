@@ -32,7 +32,7 @@ scenarios:
               url: '/qa/questions?product_id=750000'
           - get:
               url: '/qa/questions?product_id=999000'
-        count: 8
+        count: 13
   - name: GET Answers
     flow:
       - loop:
@@ -46,7 +46,7 @@ scenarios:
               url: '/qa/questions/2625000/answers'
           - get:
               url: '/qa/questions/3500000/answers'
-        count: 8
+        count: 13
   - name: POST Questions
     flow:
       - loop:
