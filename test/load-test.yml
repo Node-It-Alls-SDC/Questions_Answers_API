@@ -15,15 +15,11 @@ config:
       arrivalRate: 10
       rampTo: 100
       name: Spike phase
-    # - duration: 30
-    #   arrivalRate: 5
-    #   rampTo: 1000
-    #   name: Crash phase
   # Load & configure a couple of useful plugins
   # https://docs.art/reference/extensions
   apdex: 2000
 scenarios:
-  - name: Get Questions
+  - name: GET Questions
     flow:
       - loop:
           - get:
@@ -35,9 +31,9 @@ scenarios:
           - get:
               url: '/qa/questions?product_id=750000'
           - get:
-              url: '/qa/questions?product_id=1000011'
-        count: 20
-  - name: Get Answers
+              url: '/qa/questions?product_id=999000'
+        count: 8
+  - name: GET Answers
     flow:
       - loop:
           - get:
@@ -49,5 +45,140 @@ scenarios:
           - get:
               url: '/qa/questions/2625000/answers'
           - get:
-              url: '/qa/questions/3518962/answers'
-        count: 20
+              url: '/qa/questions/3500000/answers'
+        count: 8
+  - name: POST Questions
+    flow:
+      - loop:
+          - post:
+              url: '/qa/questions?product_id=1'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                product_id: '1'
+          - post:
+              url: '/qa/questions?product_id=250000'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                product_id: '250000'
+          - post:
+              url: '/qa/questions?product_id=500000'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                product_id: '500000'
+          - post:
+              url: '/qa/questions?product_id=750000'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                product_id: '750000'
+          - post:
+              url: '/qa/questions?product_id=999000'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                product_id: '999000'
+        count: 2
+  - name: POST Answers
+    flow:
+      - loop:
+          - post:
+              url: '/qa/questions/1/answers'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                photos: ['photo.png']
+          - post:
+              url: '/qa/questions/875000/answers'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                photos: ['photo.png']
+          - post:
+              url: '/qa/questions/1750000/answers'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                photos: ['photo.png']
+          - post:
+              url: '/qa/questions/2625000/answers'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                photos: ['photo.png']
+          - post:
+              url: '/qa/questions/3500000/answers'
+              json:
+                body: 'This is a supertest'
+                name: 'Supertest'
+                email: 'supertest@supertest.com'
+                photos: ['photo.png']
+        count: 2
+  - name: PUT Question Helpfulness
+    flow:
+      - loop:
+          - put:
+              url: '/qa/questions/1/helpful'
+          - put:
+              url: '/qa/questions/875000/helpful'
+          - put:
+              url: '/qa/questions/1750000/helpful'
+          - put:
+              url: '/qa/questions/2625000/helpful'
+          - put:
+              url: '/qa/questions/3500000/helpful'
+        count: 5
+  - name: PUT Question Report
+    flow:
+      - loop:
+          - put:
+              url: '/qa/questions/1/report'
+          - put:
+              url: '/qa/questions/875000/report'
+          - put:
+              url: '/qa/questions/1750000/report'
+          - put:
+              url: '/qa/questions/2625000/report'
+          - put:
+              url: '/qa/questions/3500000/report'
+        count: 5
+  - name: PUT Answers Helpfulness
+    flow:
+      - loop:
+          - put:
+              url: '/qa/answers/1/helpful'
+          - put:
+              url: '/qa/answers/1700500/helpful'
+          - put:
+              url: '/qa/answers/3425000/helpful'
+          - put:
+              url: '/qa/answers/5000000/helpful'
+          - put:
+              url: '/qa/answers/6850000/helpful'
+        count: 5
+  - name: PUT Answers Report
+    flow:
+      - loop:
+          - put:
+              url: '/qa/answers/1/report'
+          - put:
+              url: '/qa/answers/1700500/report'
+          - put:
+              url: '/qa/answers/3425000/report'
+          - put:
+              url: '/qa/answers/5000000/report'
+          - put:
+              url: '/qa/answers/6850000/report'
+        count: 5
+

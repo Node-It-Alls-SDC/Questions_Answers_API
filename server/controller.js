@@ -16,20 +16,7 @@ module.exports = {
     return Models.Questions.create({product_id, question_body, asker_name, asker_email})
   },
   addAnswer: (question_id, body, answerer_name, answerer_email, photos) => {
-    return Models.Answers.create({question_id, body, answerer_name, answerer_email})
-      .then((res) => {
-        if (photos.length > 0) {
-          var inserted = photos.map(photo => {
-            return {
-              url: photo,
-              answer_id: res.answer_id
-            }
-          })
-          return Models.Photos.bulkCreate(inserted);
-        } else {
-          return new Promise((resolve, reject) => resolve());
-        }
-      })
+    return Models.Answers.create({question_id, body, answerer_name, answerer_email, photos}, {include: [{model: Models.Photos, as: 'photos'}]})
   },
   helpfulQuestion: (question_id) => {
     return Models.Questions.increment({question_helpfulness: 1}, {where: {question_id}});

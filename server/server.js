@@ -1,16 +1,49 @@
 const express = require('express');
-
+const compression = require('compression');
 require('dotenv').config();
 const controller = require('./controller.js');
-const {transformQuestion, transformAnswer} = require('./utils/transform.js');
+const {transformQuestion, transformPhotos} = require('./utils/transform.js');
 const cluster = require("cluster");
-const os = require('os')
+const os = require('os');
+const NodeCache = require( "node-cache" );
+const cache = new NodeCache
+const getCache = (req, res, next) => {
+  var data;
+  if (req.query.product_id) {
+    data = cache.get(req.query.product_id + 'q');
+  } else if (req.params.question_id) {
+    data = cache.get(req.params.question_id + 'a')
+  }
+  if (data) {
+    res.send(data);
+  } else {
+    next();
+  }
+}
 
+const deleteCache = (req, res, next) => {
+  var data;
+  if (req.query.product_id) {
+    data = cache.get(req.query.product_id + 'q');
+    if (data) {
+      cache.del(req.query.product_id + 'q')
+    }
+  } else if (req.params.question_id) {
+    data = cache.get(req.params.question_id + 'a')
+    if (data) {
+      cache.del(req.params.question_id + 'a')
+    }
+  }
+  next();
+}
 if (cluster.isMaster) {
   const CPUs = os.cpus().length;
   for(let i = 0; i< CPUs; i++){
     cluster.fork()
   }
+  cluster.on('exit', (worker, code, signal) => {
+    cluster.fork();
+  });
 } else {
   const app = express();
   app.use(express.json());
@@ -24,17 +57,14 @@ if (cluster.isMaster) {
   })
 
   //GET Questions
-  app.get('/qa/questions', (req, res) => {
-    if (!req.query.product_id) {
-      return res.status(400).send('ProductId is missing');
-    }
-    if (isNaN(Number(req.query.product_id)) || Number(req.query.product_id) <= 0 || Number(req.query.product_id) > 4294967295) {
-      return res.status(404).send('Invalid ProductId')
-    }
+  app.get('/qa/questions', getCache, (req, res) => {
     controller.getQuestions(req.query.product_id, Number(req.query?.page), Number(req.query?.count))
       .then(result => {
         transformQuestion(result)
-          .then(tq => res.send({product_id: Number(req.query.product_id), results: tq}))
+          .then(tq => {
+            cache.set(req.query.product_id + 'q', {product_id: Number(req.query.product_id), results: tq}, 10000 );
+            res.send({product_id: Number(req.query.product_id), results: tq})
+          })
           .catch(err => console.error(err))
       })
       .catch(err => {
@@ -43,22 +73,25 @@ if (cluster.isMaster) {
   })
 
   //GET Answers
-  app.get('/qa/questions/:question_id/answers', (req, res) => {
-    var question_id = Number(req.params.question_id)
-    var page = Number(req.query?.page) ? Number(req.query?.page) : 1
-    var count = Number(req.query?.count) ? Number(req.query?.count) : 5
-    if (isNaN(question_id) || question_id <= 0 || question_id > 4294967295) {
-      return res.status(404).send('Invalid QuestionId')
-    }
+  app.get('/qa/questions/:question_id/answers', getCache, (req, res) => {
+    var question_id = Number(req.params.question_id);
+    var page = Number(req.query?.page) ? Number(req.query?.page) : 1;
+    var count = Number(req.query?.count) ? Number(req.query?.count) : 5;
     controller.getAnswers(question_id, page, count)
-      .then(result =>
+      .then(result => {
+        cache.set(req.params.question_id + 'a', {
+          question: question_id,
+          page: page ? page : 1,
+          count: count ? count : 5,
+          results: JSON.parse(JSON.stringify(result))
+        }, 10000)
         res.send({
-          question: Number(req.params.question_id),
-          page: Number(req.query?.page) ? Number(req.query?.page) : 1,
-          count: Number(req.query?.count) ? Number(req.query?.count) : 5,
+          question: question_id,
+          page: page ? page : 1,
+          count: count ? count : 5,
           results: result
         })
-      )
+      })
       .catch(err => {
         console.error(err)
         res.status(500).send(err)
@@ -66,35 +99,14 @@ if (cluster.isMaster) {
   })
 
   //POST Questions
-  app.post('/qa/questions', (req, res) => {
-    if (!req.body.product_id) {
-      return res.status(400).send('ProductId is missing');
-    }
-    if (isNaN(Number(req.body.product_id)) || req.body.product_id <= 0 || req.body.product_id > 4294967295) {
-      return res.status(404).send('Invalid ProductId')
-    }
-    if (!req.body || !req.body.body || !req.body.name || !req.body.email) {
-      return res.status(400).send('Missing one or more fields from the body');
-    }
-    if (typeof req.body.body !== 'string' || typeof req.body.email !== 'string' || typeof req.body.name !== 'string') {
-      return res.status(404).send('Invalid Form');
-    }
+  app.post('/qa/questions', deleteCache, (req, res) => {
     controller.addQuestion(req.body.product_id, req.body.body, req.body.name, req.body.email)
       .then(() => res.sendStatus(201))
       .catch(err => res.status(500).send(err))
   })
 
   //POST Answers
-  app.post('/qa/questions/:question_id/answers', (req, res) => {
-    if (isNaN(Number(req.params.question_id)) || req.params.question_id <= 0 || req.params.question_id > 4294967295) {
-      return res.status(404).send('Invalid QuestionId');
-    }
-    if (!req.body || !req.body.body || !req.body.name || !req.body.email || !req.body.photos) {
-      return res.status(400).send('Missing one or more fields from the body');
-    }
-    if (typeof req.body.body !== 'string' || typeof req.body.email !== 'string' || typeof req.body.name !== 'string' || !Array.isArray(req.body.photos)) {
-      return res.status(404).send('Invalid Form');
-    }
+  app.post('/qa/questions/:question_id/answers', deleteCache, transformPhotos, (req, res) => {
     controller.addAnswer(req.params.question_id, req.body.body, req.body.name, req.body.email, req.body.photos)
       .then(() => res.sendStatus(201))
       .catch(err => res.status(500).send(err))
@@ -102,19 +114,13 @@ if (cluster.isMaster) {
 
   //Increase helpfulness of Question by 1
   app.put('/qa/questions/:question_id/helpful', (req, res) => {
-    if (isNaN(Number(req.params.question_id)) || req.params.question_id <= 0 || req.params.question_id > 4294967295) {
-      return res.status(404).send('Invalid QuestionId')
-    }
     controller.helpfulQuestion(req.params.question_id)
       .then(() => res.sendStatus(204))
       .catch(err => res.status(500).send(err))
   })
 
   //Mark question as reported
-  app.put('/qa/questions/:question_id/report', (req, res) => {
-    if (isNaN(Number(req.params.question_id)) || req.params.question_id <= 0 || req.params.question_id > 4294967295) {
-      return res.status(404).send('Invalid QuestionId')
-    }
+  app.put('/qa/questions/:question_id/report', deleteCache, (req, res) => {
     controller.reportQuestion(req.params.question_id)
       .then(() => res.sendStatus(204))
       .catch(err => res.status(500).send(err))
@@ -122,9 +128,6 @@ if (cluster.isMaster) {
 
   //Increase helpfulness of Answer by 1
   app.put('/qa/answers/:answer_id/helpful', (req, res) => {
-    if (isNaN(Number(req.params.answer_id)) || req.params.answer_id <= 0 || req.params.answer_id > 4294967295) {
-      return res.status(404).send('Invalid AnswerId')
-    }
     controller.helpfulAnswer(req.params.answer_id)
       .then(() => res.sendStatus(204))
       .catch(err => res.status(500).send(err))
@@ -132,9 +135,6 @@ if (cluster.isMaster) {
 
   //Mark answer as reported
   app.put('/qa/answers/:answer_id/report', (req, res) => {
-    if (isNaN(Number(req.params.answer_id)) || req.params.answer_id <= 0 || req.params.answer_id > 4294967295) {
-      return res.status(404).send('Invalid AnswerId')
-    }
     controller.reportAnswer(req.params.answer_id)
       .then(() => res.sendStatus(204))
       .catch(err => res.status(500).send(err))
