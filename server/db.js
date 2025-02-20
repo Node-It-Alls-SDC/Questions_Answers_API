@@ -1,10 +1,11 @@
 const { Sequelize, DataTypes } = require("sequelize");
-
+require('dotenv').config();
 const sequelize = new Sequelize(
- 'QA',
- 'kevinvar',
- '',
+  'QA',
+  'root',
+  'password',
   {
+    host: process.env.HOST,
     dialect: 'mysql',
     logging: false,
     pool: {
