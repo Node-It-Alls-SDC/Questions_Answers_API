@@ -48,6 +48,10 @@ if (cluster.isMaster) {
   const app = express();
   app.use(express.json());
 
+  app.get('/loaderio-63274c965b827a70b2f6d692581f6e0a', (req, res) => {
+    res.send('loaderio-63274c965b827a70b2f6d692581f6e0a');
+  })
+
   app.get('/', (req, res) => {
     res.send('This is the API for Questions and Answers\nIf you want to look at questions for a certain product\nJust go to /qa for more information or look at the documentation in the ReadMe file')
   })

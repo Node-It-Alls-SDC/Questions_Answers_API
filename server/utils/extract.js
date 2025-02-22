@@ -6,7 +6,7 @@ const questions = './data/questions.csv';
 const answers = './data/answers.csv';
 const photos = './data/answers_photos.csv';
 
-const BATCHSIZE = 20000;
+const BATCHSIZE = 1000;
 
 const questionStream = (Questions) => {
   return new Promise ((resolve, reject) => {

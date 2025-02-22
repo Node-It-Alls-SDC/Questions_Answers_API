@@ -11,7 +11,7 @@ ARG NODE_VERSION=23.7.0
 FROM node:${NODE_VERSION}-alpine
 
 # Use production node environment by default.
-ENV PORT=3000 HOST=0.0.0.0 NODE_ENV=production
+ENV PORT=3000 HOST=ec2-3-135-194-233.us-east-2.compute.amazonaws.com NODE_ENV=production
 
 
 WORKDIR /server
