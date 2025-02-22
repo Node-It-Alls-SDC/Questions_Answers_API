@@ -1,6 +1,6 @@
 # Questions and Answers API
 
-API for a Questions and Answers section of a single page E-commerce site using ExpressJS, MySQL, and Docker to concatenize the Express Server.
+API for a Questions and Answers section of a single page E-commerce site using ExpressJS, MySQL, and Docker to containerize the Express Server.
 
 # Starting the Server
 - Create mysql database and in a .env file add a PORT and HOST variable
